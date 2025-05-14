@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Escalas Alfa (v2.4 - Compartilhamento de Arquivo)</title>
+    <style>
+        :root {
+            --cor-primaria: #3a5a8f;
+            --cor-primaria-hover: #2a4a7f;
+            --cor-secundaria: #5a788d;
+            --cor-secundaria-hover: #4a687d;
+            --cor-sucesso: #488d6d;
+            --cor-sucesso-hover: #387d5d;
+            --cor-perigo: #b35a5a;
+            --cor-perigo-hover: #a34a4a;
+            --cor-aviso: #c3954d;
+            --cor-aviso-hover: #b3853d;
+            --cor-info: #4d8dc3;
+            --cor-info-hover: #3d7db3;
+            --cor-ferias: #4db39f;
+            --cor-ferias-hover: #3da38f;
+            --cor-vaga-aberta: #d49e5e;
+            --cor-turno-manha: #4a6fa5;
+            --cor-turno-intermediario: #5a7fa5;
+            --cor-turno-tarde: #6a8fa5;
+            --cor-turno-noite: #3a5a8f;
+            --cor-fundo: #f5f7fa;
+            --cor-fundo-container: #ffffff;
+            --cor-fundo-item: #ffffff;
+            --cor-fundo-item-hover: #f0f4f8;
+            --cor-fundo-item-folga: #fff8e8;
+            --cor-fundo-item-atestado: #e8f4fa;
+            --cor-fundo-item-falta: #fae8e8;
+            --cor-fundo-item-ferias: #e8faf4;
+            --cor-fundo-item-vaga: #faf0e8;
+            --cor-fundo-section: #ffffff;
+            --cor-fundo-caixa-turno: #f0f4f8;
+            --cor-borda: #d1dbe5;
+            --cor-borda-section: #d1dbe5;
+            --cor-borda-item: 1px solid #d8e1e8;
+            --cor-borda-fina: 1px solid #d8e1e8;
+            --cor-texto: #2d3748;
+            --cor-texto-claro: #ffffff;
+            --cor-texto-secundario: #4a5568;
+            --font-padrao: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --radius-padrao: 6px;
+            --sombra-padrao: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        body {
+            font-family: var(--font-padrao);
+            margin: 0;
+            background-color: var(--cor-fundo);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            color: var(--cor-texto);
+            min-height: 100vh;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        .container {
+            background-color: var(--cor-fundo-container);
+            padding: 16px;
+            border-radius: var(--radius-padrao);
+            box-shadow: var(--sombra-padrao);
+            width: 100%;
+            max-width: 1000px;
+            box-sizing: border-box;
+        }
+        h1, h2 {
+            margin-top: 0;
+            font-weight: 600;
+            color: var(--cor-texto);
+        }
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 16px;
+            color: var(--cor-primaria);
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: var(--cor-borda-fina);
+        }
+        h2 {
+            font-size: 1.4em;
+            margin-bottom: 12px;
+            color: var(--cor-texto);
+            border-bottom: var(--cor-borda-fina);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section {
+            margin-bottom: 18px;
+            padding: 14px;
+            border: var(--cor-borda-fina);
+            border-radius: var(--radius-padrao);
+            background-color: var(--cor-fundo-section);
+            box-shadow: var(--sombra-padrao);
+        }
+        .section h2 {
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+        .section h3 {
+            font-size: 1.1em;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            color: var(--cor-texto-secundario);
+            border-bottom: 1px dotted var(--cor-borda);
+            padding-bottom: 4px;
+        }
+        .section h4 {
+            font-size: 1.0em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: var(--cor-texto);
+            font-weight: 500;
+            padding-bottom: 5px;
+            border-bottom: 1px dotted var(--cor-borda-section);
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+            color: var(--cor-texto-secundario);
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="checkbox"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: var(--cor-borda-fina);
+            border-radius: var(--radius-padrao);
+            font-size: 1em;
+            box-sizing: border-box;
+            background-color: var(--cor-fundo-container);
+            transition: all 0.2s ease;
+        }
+        .form-group textarea {
+            min-height: 60px;
+            line-height: 1.5;
+        }
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--cor-primaria);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.15);
+        }
+        .ferias-group {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--cor-borda);
+        }
+        .ferias-periodo {
+            font-size: 0.9em;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ferias-periodo button {
+            font-size: 0.8em !important;
+            padding: 4px 8px !important;
+            margin-left: 8px;
+            background-color: #fae8e8;
+            color: var(--cor-perigo);
+            border: 1px solid var(--cor-perigo);
+        }
+        .ferias-periodo button:hover {
+            background-color: #f8d7da;
+        }
+        .ferias-info-lista {
+            display: block;
+            font-size: 0.85em;
+            margin-top: 6px;
+            padding: 6px 8px;
+            background-color: var(--cor-fundo-item-ferias);
+            border-radius: var(--radius-padrao);
+            text-align: left;
+            border: 1px dashed var(--cor-ferias);
+        }
+        button {
+            padding: 10px 16px; /* Padding padrão para botões */
+            border: none;
+            border-radius: var(--radius-padrao);
+            cursor: pointer;
+            font-size: 0.95em; /* Fonte padrão para botões */
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin: 4px 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        button.small {
+            padding: 5px 10px;
+            font-size: 0.85em;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        button.primary { background-color: var(--cor-primaria); color: var(--cor-texto-claro); }
+        button.primary:hover { background-color: var(--cor-primaria-hover); }
+        button.success { background-color: var(--cor-sucesso); color: var(--cor-texto-claro); }
+        button.success:hover { background-color: var(--cor-sucesso-hover); }
+        button.danger { background-color: var(--cor-perigo); color: var(--cor-texto-claro); }
+        button.danger:hover { background-color: var(--cor-perigo-hover); }
+        button.warning { background-color: var(--cor-aviso); color: var(--cor-texto); }
+        button.warning:hover { background-color: var(--cor-aviso-hover); }
+        button.info { background-color: var(--cor-info); color: var(--cor-texto-claro); }
+        button.info:hover { background-color: var(--cor-info-hover); }
+        button.secondary { background-color: var(--cor-secundaria); color: var(--cor-texto-claro); }
+        button.secondary:hover { background-color: var(--cor-secundaria-hover); }
+        button.toggle-form {
+            background-color: var(--cor-primaria);
+            color: var(--cor-texto-claro);
+            width: 100%;
+            margin-bottom: 16px;
+            font-size: 1.05em;
+            padding: 12px;
+        }
+        button.toggle-form:hover { background-color: var(--cor-primaria-hover); }
+        
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center; 
+            flex-wrap: wrap; 
+            margin-top: 12px;
+        }
+        
+        .backup-container .actions-bar {
+            justify-content: stretch; 
+        }
+
+        .backup-container .actions-bar button {
+            flex-grow: 1;   
+            flex-shrink: 1; 
+            flex-basis: 0;  
+            padding: 8px 12px; /* MODIFICADO: Padding reduzido para botões de backup */
+            font-size: 0.9em;  /* MODIFICADO: Fonte reduzida para botões de backup */
+        }
+
+        .turno-group {
+            margin-bottom: 16px;
+            border-radius: var(--radius-padrao);
+            background-color: var(--cor-fundo-caixa-turno);
+            box-shadow: var(--sombra-padrao);
+            overflow: hidden;
+        }
+        .turno-caixa-manha { border-left: 4px solid var(--cor-turno-manha); }
+        .turno-caixa-intermediario { border-left: 4px solid var(--cor-turno-intermediario); }
+        .turno-caixa-tarde { border-left: 4px solid var(--cor-turno-tarde); }
+        .turno-caixa-noite { border-left: 4px solid var(--cor-turno-noite); }
+        .turno-caixa-outros { border-left: 4px solid var(--cor-borda); }
+        .turno-group > h3 {
+            font-size: 1.15em;
+            margin: 0;
+            background-color: rgba(0,0,0,0.03);
+            color: var(--cor-texto);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: var(--cor-borda-fina);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .turno-content { padding: 10px; }
+        .funcionario-item {
+            background-color: var(--cor-fundo-item);
+            margin-bottom: 6px;
+            border: var(--cor-borda-item);
+            border-left-width: 3px;
+            border-radius: var(--radius-padrao);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+        .funcionario-item:hover {
+            background-color: var(--cor-fundo-item-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .main-info-compacto {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 12px;
+            overflow: hidden;
+        }
+        .nome-compacto {
+            font-weight: 500;
+            font-size: 1em;
+            color: var(--cor-texto);
+            flex-grow: 1;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+        .nome-compacto-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        .descricao-personalizada-inline,
+        .observacao-programada-inline {
+            font-size: 0.8em;
+            color: var(--cor-texto-secundario);
+            margin-left: 0px;
+            font-style: italic;
+            display: block;
+            margin-top: 2px;
+            white-space: normal;
+        }
+        .status-indicador-compacto {
+            font-size: 0.85em;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-align: center;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .funcionario-item.trabalhando .status-indicador-compacto { background-color: var(--cor-sucesso); color: var(--cor-texto-claro); }
+        .funcionario-item.folga .status-indicador-compacto { background-color: var(--cor-aviso); color: var(--cor-texto); }
+        .funcionario-item.atestado .status-indicador-compacto { background-color: var(--cor-info); color: var(--cor-texto-claro); }
+        .funcionario-item.falta .status-indicador-compacto { background-color: var(--cor-perigo); color: var(--cor-texto-claro); }
+        .funcionario-item.ferias .status-indicador-compacto { background-color: var(--cor-ferias); color: var(--cor-texto-claro); font-size: 0.8em; }
+        .funcionario-item.vaga-aberta-item .status-indicador-compacto { background-color: var(--cor-vaga-aberta); color: var(--cor-texto); }
+
+        .funcionario-item.trabalhando { border-left-color: var(--cor-sucesso); }
+        .funcionario-item.folga { border-left-color: var(--cor-aviso); background-color: var(--cor-fundo-item-folga); }
+        .funcionario-item.atestado { border-left-color: var(--cor-info); background-color: var(--cor-fundo-item-atestado); }
+        .funcionario-item.falta { border-left-color: var(--cor-perigo); background-color: var(--cor-fundo-item-falta); }
+        .funcionario-item.ferias { border-left-color: var(--cor-ferias); background-color: var(--cor-fundo-item-ferias); }
+        .funcionario-item.vaga-aberta-item { border-left-color: var(--cor-vaga-aberta); background-color: var(--cor-fundo-item-vaga); }
+
+        .funcionario-item .item-actions {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            padding: 10px 12px 12px;
+            border-top: var(--cor-borda-fina);
+            gap: 20px;
+            box-sizing: border-box;
+        }
+        .funcionario-item.actions-expanded .item-actions {
+            display: flex;
+            flex-direction: column;
+        }
+        .funcionario-item .item-actions-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 8px;
+            width: 100%;
+        }
+        .funcionario-item .item-actions-buttons button {
+            padding: 9px 12px;
+            font-size: 0.9em;
+            background-color: #f0f4f8;
+            border: var(--cor-borda-fina);
+            color: var(--cor-texto);
+            margin: 0;
+            flex-grow: 0;
+            flex-shrink: 1;
+            flex-basis: calc(50% - 4px);
+            min-width: 100px;
+            box-sizing: border-box;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.2s ease;
+        }
+        .funcionario-item .item-actions-buttons button:hover {
+            background-color: #e0e8f0;
+            transform: translateY(-1px);
+        }
+        .observacoes-programadas-section {
+            padding-top: 10px;
+            border-top: 1px dashed var(--cor-borda);
+            width: 100%;
+        }
+        .observacoes-programadas-section > h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+            color: var(--cor-texto);
+            font-weight: 500;
+        }
+        .observacoes-programadas-section .form-add-observacao-programada {
+            border: 1px dashed var(--cor-secundaria);
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border-radius: var(--radius-padrao);
+            background-color: #fdfdff;
+        }
+        .observacoes-programadas-section .form-add-observacao-programada .form-group { margin-bottom: 10px; }
+        .observacoes-programadas-section .form-add-observacao-programada label { font-size: 0.9em; }
+        .observacoes-programadas-section .form-add-observacao-programada textarea { min-height: 50px; font-size: 0.95em; }
+        .observacoes-programadas-section .form-add-observacao-programada select,
+        .observacoes-programadas-section .form-add-observacao-programada input[type="date"],
+        .observacoes-programadas-section .form-add-observacao-programada input[type="checkbox"] {
+            font-size: 0.95em;
+            padding: 8px 10px;
+        }
+        .observacoes-programadas-section .form-add-observacao-programada input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .observacoes-programadas-section .form-buttons-op {
+            text-align: right;
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .observacoes-programadas-section .campo-condicional-observacao-programada {
+            display: none;
+            margin-top: 8px;
+        }
+        .lista-observacoes-programadas-salvas ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+        .lista-observacoes-programadas-salvas li {
+            background-color: var(--cor-fundo-caixa-turno);
+            padding: 10px 12px;
+            border-radius: var(--radius-padrao);
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--cor-borda);
+            gap: 10px;
+        }
+        .lista-observacoes-programadas-salvas li .op-content { flex-grow: 1; }
+        .lista-observacoes-programadas-salvas li .op-content .op-texto {
+            font-weight: 500;
+            display: block;
+            color: var(--cor-texto);
+            word-break: break-word;
+        }
+        .lista-observacoes-programadas-salvas li .op-content .op-detalhes,
+        .lista-observacoes-programadas-salvas li .op-content .op-status {
+            font-size: 0.85em;
+            color: var(--cor-texto-secundario);
+            display: block;
+            margin-top: 3px;
+        }
+        .lista-observacoes-programadas-salvas li .op-content .op-status { font-style: italic; }
+        .lista-observacoes-programadas-salvas li .op-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .lista-observacoes-programadas-salvas li .op-actions button {
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 5px 8px;
+            font-size: 0.85em;
+            margin-left: 0;
+        }
+        .lista-observacoes-programadas-salvas li .op-actions button.warning { color: var(--cor-aviso-hover); border-color: var(--cor-aviso); }
+        .lista-observacoes-programadas-salvas li .op-actions button.warning:hover { background-color: var(--cor-aviso); color: var(--cor-texto); }
+        .lista-observacoes-programadas-salvas li .op-actions button.danger { color: var(--cor-perigo-hover); border-color: var(--cor-perigo); }
+        .lista-observacoes-programadas-salvas li .op-actions button.danger:hover { background-color: var(--cor-perigo); color: white; }
+
+        #form-cadastro-funcionario { display: none; }
+        #storage-info {
+            font-size: 0.85em;
+            text-align: center;
+            color: var(--cor-texto-secundario);
+            margin-top: 16px;
+            padding: 8px;
+            background-color: var(--cor-fundo-caixa-turno);
+            border-radius: var(--radius-padrao);
+            border: var(--cor-borda-fina);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: var(--cor-texto-secundario);
+            font-size: 1.05em;
+        }
+        .empty-state svg {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        .descricoes-personalizadas-form-group {
+            padding: 10px;
+            border: 1px dashed var(--cor-borda);
+            border-radius: var(--radius-padrao);
+            margin-top: 15px;
+        }
+        .descricoes-personalizadas-form-group .form-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .descricoes-personalizadas-form-group .form-group > div { flex: 1; }
+        .descricoes-personalizadas-form-group .form-group textarea { min-height: 40px; }
+        .descricoes-personalizadas-form-group button#btn-adicionar-atualizar-descricao {
+            padding: 8px 12px;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+        #lista-descricoes-cadastradas-form ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+        #lista-descricoes-cadastradas-form li {
+            background-color: var(--cor-fundo-caixa-turno);
+            padding: 8px 10px;
+            border-radius: var(--radius-padrao);
+            margin-bottom: 6px;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--cor-borda);
+            gap: 10px;
+        }
+        #lista-descricoes-cadastradas-form li .descricao-content {
+            flex-grow: 1;
+            word-break: break-word;
+        }
+        #lista-descricoes-cadastradas-form li .descricao-content .descricao-texto-item { display: block; }
+        #lista-descricoes-cadastradas-form li .descricao-content .descricao-detalhes-item {
+            font-size: 0.9em;
+            color: var(--cor-texto-secundario);
+            display: block;
+        }
+        #lista-descricoes-cadastradas-form li .descricao-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        #lista-descricoes-cadastradas-form li .descricao-actions button {
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            font-size: 0.85em;
+            margin-left: 0;
+        }
+        #lista-descricoes-cadastradas-form li .descricao-actions button.warning { color: var(--cor-aviso-hover); border-color: var(--cor-aviso); }
+        #lista-descricoes-cadastradas-form li .descricao-actions button.warning:hover { background-color: var(--cor-aviso); color: var(--cor-texto); }
+        #lista-descricoes-cadastradas-form li .descricao-actions button.danger { color: var(--cor-perigo-hover); border-color: var(--cor-perigo); }
+        #lista-descricoes-cadastradas-form li .descricao-actions button.danger:hover { background-color: var(--cor-perigo); color: white; }
+        .campo-condicional-descricao {
+            display: none;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 8px; font-size: 14px; }
+            .container { padding: 12px; }
+            h1 { font-size: 1.6em; }
+            h2 { font-size: 1.3em; }
+            .section { padding: 12px; }
+            .main-info-compacto { flex-wrap: wrap; }
+            .nome-compacto { white-space: normal; }
+            .descricoes-personalizadas-form-group .form-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .descricoes-personalizadas-form-group .form-group > div { width: 100%; }
+            .funcionario-item .item-actions-buttons button { flex-basis: calc(50% - 4px); }
+        }
+        @media (max-width: 480px) {
+            body { padding: 6px; font-size: 13px; }
+            .container { padding: 10px; }
+            .actions-bar button { 
+                flex-grow: 1;
+                flex-basis: 100%; 
+            }
+            .funcionario-item .item-actions-buttons button {
+                flex-grow: 1;
+                flex-basis: 100%;
+            }
+            .lista-observacoes-programadas-salvas li,
+            #lista-descricoes-cadastradas-form li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .lista-observacoes-programadas-salvas li .op-actions,
+            #lista-descricoes-cadastradas-form li .descricao-actions {
+                margin-top: 8px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="titulo-principal">🗓️ Escala de Trabalho</h1>
+
+        <button class="toggle-form" onclick="toggleCadastroForm()">➕ Adicionar Funcionário à Escala</button>
+
+        <div id="form-cadastro-funcionario" class="section" style="display:none;">
+            <h2 id="form-cadastro-titulo">📝 Novo Item da Escala</h2>
+            <input type="hidden" id="edit-item-id">
+
+            <div class="form-group">
+                <label for="is-vaga-aberta-checkbox">
+                    <input type="checkbox" id="is-vaga-aberta-checkbox" onchange="handleVagaAbertaCheckbox()"> Marcar como Vaga em Aberto?
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="item-nome">Nome (Funcionário ou da Vaga):</label>
+                <input type="text" id="item-nome" name="item-nome" placeholder="Ex: João Silva ou Vaga Manhã 1">
+            </div>
+
+            <div id="secao-descricoes-personalizadas-funcionario" class="descricoes-personalizadas-form-group" style="display:none;">
+                <h3>Descrições Personalizadas (Visíveis Imediatamente)</h3>
+                <input type="hidden" id="editing-desc-id">
+                <div class="form-group">
+                    <div>
+                        <label for="nova-descricao-texto">Texto da Descrição:</label>
+                        <textarea id="nova-descricao-texto" placeholder="Informe a descrição"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="nova-descricao-tipo-agendamento">Quando exibir?</label>
+                        <select id="nova-descricao-tipo-agendamento" onchange="toggleCamposDescricaoCondicionais()">
+                            <option value="semData">Somente Hoje (dia atual)</option>
+                            <option value="dataEspecifica">Em Data Específica</option>
+                            <option value="periodoDeterminado">Período Determinado (Início e Fim)</option>
+                            <option value="recorrente">Recorrente (Início e Ciclo)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="campo-data-especifica-descricao" class="form-group campo-condicional-descricao">
+                    <div>
+                        <label for="nova-descricao-data-especifica">Data Específica:</label>
+                        <input type="date" id="nova-descricao-data-especifica">
+                    </div>
+                </div>
+                <div id="campos-periodo-determinado-descricao" class="form-group campo-condicional-descricao" style="display:none;">
+                    <div>
+                        <label for="nova-descricao-data-inicio-periodo">Data de Início do Período:</label>
+                        <input type="date" id="nova-descricao-data-inicio-periodo">
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label for="nova-descricao-data-fim-periodo">Data de Fim do Período:</label>
+                        <input type="date" id="nova-descricao-data-fim-periodo">
+                    </div>
+                </div>
+                <div id="campos-recorrencia-descricao" class="campo-condicional-descricao">
+                    <div class="form-group">
+                        <div>
+                            <label for="nova-descricao-data-inicio-recorrencia">Data de Início da Recorrência/Ciclo:</label>
+                            <input type="date" id="nova-descricao-data-inicio-recorrencia">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label for="nova-descricao-frequencia">Ciclo de Repetição:</label>
+                            <select id="nova-descricao-frequencia">
+                                <option value="5x1">Ciclo: 1 dia SIM, 5 dias NÃO</option>
+                                <option value="6x1">Ciclo: 1 dia SIM, 6 dias NÃO</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top:10px;">
+                    <button type="button" class="secondary" id="btn-adicionar-atualizar-descricao" onclick="adicionarOuAtualizarDescricaoPersonalizadaAoForm()">➕ Adicionar Descrição Visível</button>
+                </div>
+                <div id="lista-descricoes-cadastradas-form" style="margin-top:15px;">
+                    <h4>Descrições Visíveis Adicionadas:</h4>
+                    <ul></ul>
+                </div>
+            </div>
+
+            <div class="form-group" id="campo-item-escala">
+                <label for="item-escala">Tipo de Escala (para Funcionário ou Vaga):</label>
+                <select id="item-escala" name="item-escala">
+                    <option value="5x1">5x1 (Trabalha 5, Folga 1)</option>
+                    <option value="6x1">6x1 (Trabalha 6, Folga 1)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="campo-primeira-folga">
+                <label for="primeira-folga">Data da Primeira Folga (para cálculo da escala do Funcionário ou Vaga):</label>
+                <input type="date" id="primeira-folga" name="primeira-folga">
+            </div>
+
+            <div class="ferias-group" id="campo-ferias-group">
+                <label>Programar Férias (Opcional - para Funcionários):</label>
+                <div id="ferias-cadastradas-lista" style="font-size:0.95em; margin-top:10px; margin-bottom: 10px;"></div>
+                <div style="display:flex; gap: 10px; align-items:flex-end;">
+                    <div class="form-group" style="flex:1;">
+                        <label for="ferias-inicio" style="font-size:0.9em;">Início Férias:</label>
+                        <input type="date" id="ferias-inicio">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="ferias-fim" style="font-size:0.9em;">Fim Férias:</label>
+                        <input type="date" id="ferias-fim">
+                    </div>
+                </div>
+                <button type="button" class="secondary" style="font-size:0.95em; padding: 10px 14px;" onclick="adicionarOuAtualizarFeriasDoForm()">💾 Salvar/Atualizar Férias</button>
+            </div>
+
+            <div class="form-group">
+                <label for="item-turno">Turno:</label>
+                <select id="item-turno" name="item-turno">
+                    <option value="manha">Manhã ☀️</option>
+                    <option value="intermediario">Intermediário ⚙️</option>
+                    <option value="tarde">Tarde 🌇</option>
+                    <option value="noite">Noite 🌙</option>
+                </select>
+            </div>
+
+            <div class="actions-bar" style="justify-content: flex-end; margin-top:18px;">
+                <button id="btn-cancelar-edicao" class="secondary" onclick="cancelarEdicaoItem()" style="display:none;">✖️ Cancelar</button>
+                <button id="btn-salvar-item" class="success" onclick="salvarItemEscala()">💾 Salvar Item</button>
+            </div>
+        </div>
+
+        <div class="view-options-container section">
+            <h2>🔍 Visualizar Escala do Dia</h2>
+            <div class="form-group">
+                <label for="data-visualizacao">Selecionar data:</label>
+                <input type="date" id="data-visualizacao" onchange="atualizarExibicaoProgramacao()">
+            </div>
+        </div>
+
+        <div class="display-section section" id="programacao-diaria-container">
+            <h2>Programação: <span id="data-display"></span></h2>
+            <div id="lista-programacao"></div>
+        </div>
+
+        <div class="backup-container section">
+            <h2>🛡️ Backup & Restauração</h2>
+            <p id="storage-info"></p>
+            <div class="actions-bar">
+                <button class="info" onclick="enviarBackupParaWhatsApp()">📲 Enviar</button>
+                <button class="secondary" onclick="mostrarBackupParaCopiaManual()">📝 Copiar</button>
+                <button class="warning" onclick="document.getElementById('restaurar-arquivo-completo-input').click()">📥 Restaurar</button>
+                <input type="file" id="restaurar-arquivo-completo-input" accept=".json" style="display: none;" onchange="processarArquivoRestauracaoCompleta(event)">
+            </div>
+            <div id="copia-manual-backup-container" style="display:none; margin-top: 15px; padding:10px; border: 1px solid var(--cor-borda); border-radius: var(--radius-padrao); background-color: var(--cor-fundo-caixa-turno);">
+                <h4>Dados do Backup para Cópia Manual:</h4>
+                <p><strong>Instruções:</strong> Selecione todo o texto abaixo, copie (Ctrl+C no computador ou segure e "Copiar" no celular). Em seguida, cole em um editor de texto (Ex: Bloco de Notas, ou um app de notas no celular) e salve o arquivo com a extensão "<strong>.json</strong>" (Exemplo: <strong>backup_escala.json</strong>).</p>
+                <p>Após salvar o arquivo, você poderá enviá-lo pelo WhatsApp anexando-o na conversa, ou guardá-lo em local seguro.</p>
+                <textarea id="backup-data-textarea" readonly style="width: 100%; min-height: 180px; margin-top: 10px; font-family: monospace; font-size: 0.85em; box-sizing: border-box; padding: 8px; border: 1px solid var(--cor-borda);"></textarea>
+                <button onclick="document.getElementById('copia-manual-backup-container').style.display='none';" style="margin-top:10px;" class="secondary">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let itensEscala = [];
+        let diarioOverrides = {};
+        let turnosAtivos = new Set();
+        let descricoesPersonalizadasNoForm = [];
+        let dataAtualGlobal;
+
+        const STORAGE_KEY_ITENS_ESCALA = 'itensEscalaAlfa_v2_4_file_share';
+        const STORAGE_KEY_OVERRIDES = 'diarioOverridesAlfa_v2_4_file_share';
+        console.log("Script v2.4 (File Share Mod) iniciado. Chaves de Storage:", STORAGE_KEY_ITENS_ESCALA, STORAGE_KEY_OVERRIDES);
+
+
+        function atualizarTituloComMesAno(dataParaTitulo) {
+            const tituloEl = document.getElementById('titulo-principal');
+            if (tituloEl && dataParaTitulo instanceof Date && !isNaN(dataParaTitulo)) {
+                let nomeMes = dataParaTitulo.toLocaleString('pt-BR', { month: 'long' });
+                nomeMes = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+                const ano = dataParaTitulo.getUTCFullYear(); 
+                tituloEl.innerHTML = `🗓️ Escala de Trabalho - ${nomeMes} / ${ano}`;
+            } else if (tituloEl) { 
+                const agora = new Date();
+                let nomeMes = agora.toLocaleString('pt-BR', { month: 'long' });
+                nomeMes = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+                const ano = agora.getFullYear();
+                tituloEl.innerHTML = `🗓️ Escala de Trabalho - ${nomeMes} / ${ano}`;
+            }
+        }
+
+
+        function parseDataUTC(dateString) {
+            if (!dateString) return null;
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const day = parseInt(parts[2], 10);
+                if (!isNaN(year) && !isNaN(month) && !isNaN(day) && year > 1000 && year < 3000) { 
+                    return new Date(Date.UTC(year, month, day));
+                }
+            }
+            console.warn("parseDataUTC: Formato de data inválido ou ano fora do intervalo esperado - ", dateString);
+            return null;
+        }
+
+        function formatarDataParaChave(dateObj) {
+            if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
+            const yyjj = dateObj.getUTCFullYear();
+            const mm = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getUTCDate()).padStart(2, '0');
+            return `${yyjj}-${mm}-${dd}`;
+        }
+
+        function formatarDataParaExibicao(dateObj) {
+            if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) return 'Data inválida';
+            const dd = String(dateObj.getUTCDate()).padStart(2, '0');
+            const mm = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+            const yyjj = dateObj.getUTCFullYear();
+            return `${dd}/${mm}/${yyjj}`;
+        }
+
+        function calcularDiferencaEmDias(dataInicio, dataFim) {
+            if (!dataInicio || !(dataInicio instanceof Date) || isNaN(dataInicio.getTime()) ||
+                !dataFim || !(dataFim instanceof Date) || isNaN(dataFim.getTime())) {
+                console.warn("calcularDiferencaEmDias: Datas inválidas", dataInicio, dataFim);
+                return NaN;
+            }
+            const umDiaEmMilissegundos = 24 * 60 * 60 * 1000;
+            const inicioUTC = Date.UTC(dataInicio.getUTCFullYear(), dataInicio.getUTCMonth(), dataInicio.getUTCDate());
+            const fimUTC = Date.UTC(dataFim.getUTCFullYear(), dataFim.getUTCMonth(), dataFim.getUTCDate());
+            return Math.round((fimUTC - inicioUTC) / umDiaEmMilissegundos);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOMContentLoaded: Evento disparado.");
+
+            const hojeInstanciaLocal = new Date();
+            const anoHoje = hojeInstanciaLocal.getFullYear();
+            const mesHoje = String(hojeInstanciaLocal.getMonth() + 1).padStart(2, '0');
+            const diaHoje = String(hojeInstanciaLocal.getDate()).padStart(2, '0');
+            dataAtualGlobal = `${anoHoje}-${mesHoje}-${diaHoje}`;
+            atualizarTituloComMesAno(parseDataUTC(dataAtualGlobal)); 
+
+            setInterval(() => {
+                const agoraLocal = new Date();
+                const ano = agoraLocal.getFullYear();
+                const mes = String(agoraLocal.getMonth() + 1).padStart(2, '0');
+                const dia = String(agoraLocal.getDate()).padStart(2, '0');
+                dataAtualGlobal = `${ano}-${mes}-${dia}`;
+            }, 60000);
+
+
+            try {
+                carregarDados();
+                const dataVisInput = document.getElementById('data-visualizacao');
+                if (dataVisInput) {
+                    dataVisInput.value = dataAtualGlobal;
+                    console.log("DOMContentLoaded: Data inicial configurada para (local)", dataVisInput.value);
+                    const event = new Event('change', { bubbles: true });
+                    dataVisInput.dispatchEvent(event);
+                } else {
+                    console.error("DOMContentLoaded: Elemento #data-visualizacao não encontrado.");
+                }
+                const storageInfoEl = document.getElementById('storage-info');
+                if (storageInfoEl) {
+                    storageInfoEl.innerHTML = `ℹ️ Dados salvos localmente. Considere usar as opções de backup regularmente!`;
+                }
+                toggleCamposDescricaoCondicionais();
+            } catch (e) {
+                console.error("Erro no DOMContentLoaded:", e);
+            }
+        });
+
+        function handleVagaAbertaCheckbox() {
+            const isChecked = document.getElementById('is-vaga-aberta-checkbox').checked;
+            const secaoDescricoesVisiveis = document.getElementById('secao-descricoes-personalizadas-funcionario');
+            const campoFeriasGroup = document.getElementById('campo-ferias-group');
+            const nomeInput = document.getElementById('item-nome');
+            const editItemId = document.getElementById('edit-item-id').value;
+            const itemEmEdicao = editItemId ? itensEscala.find(i => i.id === editItemId) : null;
+
+            if (isChecked) {
+                if(secaoDescricoesVisiveis) secaoDescricoesVisiveis.style.display = 'none';
+                if(campoFeriasGroup) campoFeriasGroup.style.display = 'none';
+                descricoesPersonalizadasNoForm = [];
+                document.getElementById('editing-desc-id').value = '';
+                renderizarDescricoesNoForm();
+                if (!editItemId || (itemEmEdicao && !itemEmEdicao.isVagaAberta)) {
+                    if (nomeInput && (nomeInput.value === '' || !nomeInput.value.toLowerCase().includes('vaga'))) {
+                         nomeInput.value = 'VAGA EM ABERTO';
+                    }
+                }
+                if(nomeInput) nomeInput.placeholder = 'Ex: VAGA MANHÃ TÉCNICO';
+            } else {
+                if(secaoDescricoesVisiveis) secaoDescricoesVisiveis.style.display = 'block';
+                if(campoFeriasGroup) campoFeriasGroup.style.display = 'block';
+                if (nomeInput && nomeInput.value === 'VAGA EM ABERTO' && (!itemEmEdicao || itemEmEdicao.isVagaAberta) ) {
+                    nomeInput.value = '';
+                }
+                 if(nomeInput) nomeInput.placeholder = 'Nome completo do funcionário';
+            }
+        }
+
+        function toggleCadastroForm(modoEdicao = false, item = null) {
+            const form = document.getElementById('form-cadastro-funcionario');
+            const tituloForm = document.getElementById('form-cadastro-titulo');
+            const btnSalvar = document.getElementById('btn-salvar-item');
+            const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
+            const editItemIdInput = document.getElementById('edit-item-id');
+
+            limparFormularioDescricaoVisivel();
+            document.querySelectorAll('.funcionario-item.actions-expanded').forEach(openItem => {
+                openItem.classList.remove('actions-expanded');
+            });
+
+            const feriasParaExibir = (item && Array.isArray(item.feriasProgramadas)) ? item.feriasProgramadas : [];
+            exibirFeriasCadastradas(item ? item.id : null, feriasParaExibir);
+
+            if (modoEdicao && item) {
+                tituloForm.textContent = item.isVagaAberta ? '✏️ Editar Vaga' : '👤 Editar Funcionário';
+                editItemIdInput.value = item.id;
+                document.getElementById('item-nome').value = item.nome || '';
+                document.getElementById('item-turno').value = item.turno || 'manha';
+                document.getElementById('is-vaga-aberta-checkbox').checked = item.isVagaAberta || false;
+                document.getElementById('primeira-folga').value = item.primeiraFolga || '';
+                document.getElementById('item-escala').value = item.escala || '5x1';
+
+                if (feriasParaExibir.length > 0 && feriasParaExibir[0]) {
+                    document.getElementById('ferias-inicio').value = feriasParaExibir[0].inicio || '';
+                    document.getElementById('ferias-fim').value = feriasParaExibir[0].fim || '';
+                } else {
+                    document.getElementById('ferias-inicio').value = '';
+                    document.getElementById('ferias-fim').value = '';
+                }
+
+                if (!item.isVagaAberta && Array.isArray(item.descricoesPersonalizadas)) {
+                    descricoesPersonalizadasNoForm = JSON.parse(JSON.stringify(item.descricoesPersonalizadas));
+                } else {
+                    descricoesPersonalizadasNoForm = [];
+                }
+
+                btnSalvar.textContent = '💾 Atualizar';
+                btnCancelarEdicao.style.display = 'inline-block';
+            } else {
+                tituloForm.textContent = '📝 Novo Item da Escala';
+                editItemIdInput.value = '';
+                document.getElementById('item-nome').value = '';
+                document.getElementById('item-turno').value = 'manha';
+                document.getElementById('is-vaga-aberta-checkbox').checked = false;
+                document.getElementById('primeira-folga').value = '';
+                document.getElementById('item-escala').value = '5x1';
+                document.getElementById('ferias-inicio').value = '';
+                document.getElementById('ferias-fim').value = '';
+                descricoesPersonalizadasNoForm = [];
+                btnSalvar.textContent = '💾 Salvar';
+                btnCancelarEdicao.style.display = 'none';
+            }
+            handleVagaAbertaCheckbox();
+            renderizarDescricoesNoForm();
+
+            if (form.style.display === 'none' || modoEdicao) {
+                form.style.display = 'block';
+                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (!modoEdicao && form.style.display === 'block' && !editItemIdInput.value) {
+                form.style.display = 'none';
+            }
+        }
+
+        function cancelarEdicaoItem() {
+            document.getElementById('edit-item-id').value = '';
+            document.getElementById('is-vaga-aberta-checkbox').checked = false;
+            document.getElementById('item-nome').value = '';
+            document.getElementById('primeira-folga').value = '';
+            document.getElementById('item-escala').value = '5x1';
+            document.getElementById('item-turno').value = 'manha';
+            document.getElementById('ferias-inicio').value = '';
+            document.getElementById('ferias-fim').value = '';
+            const feriasListaEl = document.getElementById('ferias-cadastradas-lista');
+            if(feriasListaEl) feriasListaEl.innerHTML = '';
+
+            limparFormularioDescricaoVisivel();
+            descricoesPersonalizadasNoForm = [];
+            renderizarDescricoesNoForm();
+            handleVagaAbertaCheckbox();
+
+            document.getElementById('form-cadastro-titulo').textContent = '📝 Novo Item da Escala';
+            document.getElementById('btn-salvar-item').textContent = '💾 Salvar';
+            document.getElementById('btn-cancelar-edicao').style.display = 'none';
+            document.getElementById('form-cadastro-funcionario').style.display = 'none';
+        }
+
+        function gerarIdUnico() {
+            return '_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36).substring(0,5);
+        }
+
+        function salvarItemEscala() {
+            const nome = document.getElementById('item-nome').value.trim();
+            const turno = document.getElementById('item-turno').value;
+            const idEmEdicao = document.getElementById('edit-item-id').value;
+            const isVaga = document.getElementById('is-vaga-aberta-checkbox').checked;
+            const primeiraFolgaStr = document.getElementById('primeira-folga').value;
+            const escala = document.getElementById('item-escala').value;
+            let feriasProgramadas = [];
+
+            if (!nome || !turno) {
+                alert("⚠️ Nome e Turno são obrigatórios.");
+                return;
+            }
+            if (!primeiraFolgaStr || !escala) {
+                alert("⚠️ Data da primeira folga e tipo de escala são obrigatórios.");
+                return;
+            }
+            if (!parseDataUTC(primeiraFolgaStr)) {
+                 alert("⚠️ Data da primeira folga inválida.");
+                 return;
+            }
+
+            if (!isVaga) {
+                const feriasInicioForm = document.getElementById('ferias-inicio').value;
+                const feriasFimForm = document.getElementById('ferias-fim').value;
+
+                if (feriasInicioForm && feriasFimForm) {
+                    const dataInicioFerias = parseDataUTC(feriasInicioForm);
+                    const dataFimFerias = parseDataUTC(feriasFimForm);
+                    if (!dataInicioFerias || !dataFimFerias || dataFimFerias < dataInicioFerias) {
+                        alert("⚠️ Datas de férias inválidas ou data final anterior à inicial.");
+                        return;
+                    }
+                    feriasProgramadas = [{ inicio: feriasInicioForm, fim: feriasFimForm }];
+                } else if ((feriasInicioForm && !feriasFimForm) || (!feriasInicioForm && feriasFimForm)) {
+                     alert("⚠️ Para programar férias, preencha data de início e fim, ou deixe ambos vazios.");
+                     return;
+                }
+            }
+
+            const itemBase = {
+                nome,
+                turno,
+                isVagaAberta: isVaga,
+                primeiraFolga: primeiraFolgaStr,
+                escala,
+                feriasProgramadas: isVaga ? [] : feriasProgramadas
+            };
+
+            if (idEmEdicao) {
+                const index = itensEscala.findIndex(f => f.id === idEmEdicao);
+                if (index > -1) {
+                    const itemExistente = itensEscala[index];
+                    itensEscala[index] = {
+                        ...itemExistente,
+                        ...itemBase,
+                        descricoesPersonalizadas: isVaga ? [] : JSON.parse(JSON.stringify(descricoesPersonalizadasNoForm)),
+                        descricoesProgramadas: isVaga ? [] : (itemExistente.descricoesProgramadas || [])
+                    };
+                    alert(isVaga ? "✏️ Vaga atualizada!" : "👤 Cadastro atualizado!");
+                } else {
+                    alert("❌ Erro: Item para edição não encontrado.");
+                    return;
+                }
+            } else {
+                const novoItem = {
+                    id: gerarIdUnico(),
+                    ...itemBase,
+                    descricoesPersonalizadas: isVaga ? [] : JSON.parse(JSON.stringify(descricoesPersonalizadasNoForm)),
+                    descricoesProgramadas: []
+                };
+                itensEscala.push(novoItem);
+                alert(isVaga ? "✏️ Vaga adicionada!" : "✅ Funcionário cadastrado!");
+                if (!turnosAtivos.has(turno)) turnosAtivos.add(turno);
+            }
+
+            salvarItensEscalaNoStorage();
+            cancelarEdicaoItem();
+            atualizarExibicaoProgramacao();
+        }
+
+        function limparFormularioDescricaoVisivel() {
+            document.getElementById('nova-descricao-texto').value = '';
+            document.getElementById('nova-descricao-tipo-agendamento').value = 'semData';
+            document.getElementById('nova-descricao-data-especifica').value = '';
+            document.getElementById('nova-descricao-data-inicio-periodo').value = '';
+            document.getElementById('nova-descricao-data-fim-periodo').value = '';
+            document.getElementById('nova-descricao-data-inicio-recorrencia').value = '';
+            document.getElementById('nova-descricao-frequencia').value = '5x1';
+            document.getElementById('editing-desc-id').value = '';
+            const btnAdicionarAtualizar = document.getElementById('btn-adicionar-atualizar-descricao');
+            btnAdicionarAtualizar.textContent = '➕ Adicionar Descrição Visível';
+            btnAdicionarAtualizar.classList.remove('success', 'warning');
+            btnAdicionarAtualizar.classList.add('secondary');
+            toggleCamposDescricaoCondicionais();
+        }
+
+        function adicionarOuAtualizarDescricaoPersonalizadaAoForm() {
+            const textoEl = document.getElementById('nova-descricao-texto');
+            const tipoAgendamentoEl = document.getElementById('nova-descricao-tipo-agendamento');
+            const idDescricaoEmEdicao = document.getElementById('editing-desc-id').value;
+
+            const texto = textoEl.value.trim();
+            const tipoAgendamento = tipoAgendamentoEl.value;
+
+            if (!texto) {
+                alert("⚠️ O texto da descrição visível é obrigatório.");
+                return;
+            }
+
+            const descData = { texto: texto, tipoAgendamento: tipoAgendamento };
+
+            if (tipoAgendamento === 'dataEspecifica') {
+                const dataEspEl = document.getElementById('nova-descricao-data-especifica');
+                if(!dataEspEl || !dataEspEl.value) { alert("⚠️ Data específica é obrigatória para este tipo."); return; }
+                if(!parseDataUTC(dataEspEl.value.trim())) { alert("⚠️ Data específica inválida."); return; }
+                descData.dataEspecifica = dataEspEl.value.trim();
+            } else if (tipoAgendamento === 'periodoDeterminado') {
+                const dataIniPerEl = document.getElementById('nova-descricao-data-inicio-periodo');
+                const dataFimPerEl = document.getElementById('nova-descricao-data-fim-periodo');
+                if (!dataIniPerEl || !dataIniPerEl.value || !dataFimPerEl || !dataFimPerEl.value) { alert("⚠️ Datas de início e fim do período são obrigatórias."); return; }
+                const dataInicioObj = parseDataUTC(dataIniPerEl.value.trim());
+                const dataFimObj = parseDataUTC(dataFimPerEl.value.trim());
+                if (!dataInicioObj || !dataFimObj || dataFimObj < dataInicioObj) { alert("⚠️ Datas do período inválidas."); return; }
+                descData.dataInicioPeriodo = dataIniPerEl.value.trim();
+                descData.dataFimPeriodo = dataFimPerEl.value.trim();
+            } else if (tipoAgendamento === 'recorrente') {
+                const dataIniRecEl = document.getElementById('nova-descricao-data-inicio-recorrencia');
+                const freqRecEl = document.getElementById('nova-descricao-frequencia');
+                if(!dataIniRecEl || !dataIniRecEl.value) { alert("⚠️ Data de início da recorrência é obrigatória."); return; }
+                if(!parseDataUTC(dataIniRecEl.value.trim())) { alert("⚠️ Data de início da recorrência inválida."); return; }
+                descData.dataInicioRecorrencia = dataIniRecEl.value.trim();
+                descData.frequenciaRecorrencia = freqRecEl.value;
+            }
+
+            if (idDescricaoEmEdicao) {
+                const idx = descricoesPersonalizadasNoForm.findIndex(d => d.id === idDescricaoEmEdicao);
+                if (idx > -1) descricoesPersonalizadasNoForm[idx] = { ...descData, id: idDescricaoEmEdicao };
+            } else {
+                descricoesPersonalizadasNoForm.push({ ...descData, id: gerarIdUnico() });
+            }
+
+            limparFormularioDescricaoVisivel();
+            renderizarDescricoesNoForm();
+        }
+
+        function renderizarDescricoesNoForm() {
+            const listaUl = document.querySelector("#lista-descricoes-cadastradas-form ul");
+            if (!listaUl) return;
+            listaUl.innerHTML = '';
+
+            if (descricoesPersonalizadasNoForm.length === 0) {
+                listaUl.innerHTML = '<li>Nenhuma descrição visível adicionada.</li>';
+                return;
+            }
+
+            descricoesPersonalizadasNoForm.forEach(desc => {
+                const li = document.createElement('li');
+                li.dataset.descId = desc.id;
+                let detalhesAgendamento = '';
+                if (desc.tipoAgendamento === 'dataEspecifica' && desc.dataEspecifica) {
+                    detalhesAgendamento = `Data: ${formatarDataParaExibicao(parseDataUTC(desc.dataEspecifica))}`;
+                } else if (desc.tipoAgendamento === 'periodoDeterminado' && desc.dataInicioPeriodo && desc.dataFimPeriodo) {
+                    detalhesAgendamento = `Período: ${formatarDataParaExibicao(parseDataUTC(desc.dataInicioPeriodo))} a ${formatarDataParaExibicao(parseDataUTC(desc.dataFimPeriodo))}`;
+                } else if (desc.tipoAgendamento === 'recorrente' && desc.dataInicioRecorrencia && desc.frequenciaRecorrencia) {
+                    let tipoCiclo = desc.frequenciaRecorrencia === "5x1" ? "5x1" : "6x1";
+                    detalhesAgendamento = `Ciclo ${tipoCiclo}, início: ${formatarDataParaExibicao(parseDataUTC(desc.dataInicioRecorrencia))}`;
+                } else if (desc.tipoAgendamento === 'semData') {
+                    detalhesAgendamento = `Somente Hoje`;
+                }
+
+                li.innerHTML = `
+                    <div class="descricao-content">
+                        <span class="descricao-texto-item">"${desc.texto}"</span>
+                        <span class="descricao-detalhes-item">(${detalhesAgendamento || 'Sempre visível/Hoje'})</span>
+                    </div>
+                    <div class="descricao-actions">
+                        <button type="button" class="warning small" onclick="editarDescricaoDoForm('${desc.id}')">Editar</button>
+                        <button type="button" class="danger small" onclick="removerDescricaoDoForm('${desc.id}')">Excluir</button>
+                    </div>
+                `;
+                listaUl.appendChild(li);
+            });
+        }
+
+        function editarDescricaoDoForm(descId) {
+            const descricaoParaEditar = descricoesPersonalizadasNoForm.find(d => d.id === descId);
+            if (!descricaoParaEditar) {
+                alert("Erro: Descrição visível não encontrada para edição.");
+                return;
+            }
+            document.getElementById('nova-descricao-texto').value = descricaoParaEditar.texto;
+            document.getElementById('nova-descricao-tipo-agendamento').value = descricaoParaEditar.tipoAgendamento;
+            document.getElementById('nova-descricao-data-especifica').value = descricaoParaEditar.dataEspecifica || '';
+            document.getElementById('nova-descricao-data-inicio-periodo').value = descricaoParaEditar.dataInicioPeriodo || '';
+            document.getElementById('nova-descricao-data-fim-periodo').value = descricaoParaEditar.dataFimPeriodo || '';
+            document.getElementById('nova-descricao-data-inicio-recorrencia').value = descricaoParaEditar.dataInicioRecorrencia || '';
+            document.getElementById('nova-descricao-frequencia').value = descricaoParaEditar.frequenciaRecorrencia || '5x1';
+            toggleCamposDescricaoCondicionais();
+            document.getElementById('editing-desc-id').value = descId;
+            const btnAdicionarAtualizar = document.getElementById('btn-adicionar-atualizar-descricao');
+            btnAdicionarAtualizar.textContent = '💾 Atualizar Descrição Visível';
+            btnAdicionarAtualizar.classList.remove('secondary');
+            btnAdicionarAtualizar.classList.add('success');
+            document.getElementById('nova-descricao-texto').focus();
+        }
+
+        function removerDescricaoDoForm(descId) {
+            if (!confirm("Tem certeza que deseja excluir esta descrição visível?")) return;
+            descricoesPersonalizadasNoForm = descricoesPersonalizadasNoForm.filter(d => d.id !== descId);
+            renderizarDescricoesNoForm();
+            alert("Descrição visível removida do formulário!");
+        }
+
+        function exibirFeriasCadastradas(itemId, feriasArray) {
+            const listaFeriasDiv = document.getElementById('ferias-cadastradas-lista');
+            if (!listaFeriasDiv) return;
+            listaFeriasDiv.innerHTML = '';
+
+            if (feriasArray && feriasArray.length > 0) {
+                feriasArray.forEach((periodo, index) => {
+                    if (periodo && periodo.inicio && periodo.fim) {
+                        const inicioF = formatarDataParaExibicao(parseDataUTC(periodo.inicio));
+                        const fimF = formatarDataParaExibicao(parseDataUTC(periodo.fim));
+                        const p = document.createElement('p');
+                        p.classList.add('ferias-periodo');
+                        p.innerHTML = `<span>Período ${index + 1}: ${inicioF} até ${fimF}</span>
+                                       <button type="button" class="small" onclick="removerFeriasProgramadasNoForm('${itemId}', ${index})">Excluir Período</button>`;
+                        listaFeriasDiv.appendChild(p);
+                    }
+                });
+                if (listaFeriasDiv.innerHTML === '') {
+                     listaFeriasDiv.innerHTML = '<p style="font-size:0.9em; color: var(--cor-texto-secundario);">Nenhum período de férias programado.</p>';
+                }
+            } else {
+                listaFeriasDiv.innerHTML = '<p style="font-size:0.9em; color: var(--cor-texto-secundario);">Nenhum período de férias programado.</p>';
+            }
+        }
+
+        function removerFeriasProgramadasNoForm(itemIdParaEdicao, indexPeriodo) {
+            const feriasInicioInput = document.getElementById('ferias-inicio');
+            const feriasFimInput = document.getElementById('ferias-fim');
+
+            feriasInicioInput.value = '';
+            feriasFimInput.value = '';
+
+            exibirFeriasCadastradas(itemIdParaEdicao, []);
+            alert("Período de férias removido do formulário. Salve o item para confirmar.");
+        }
+
+        function adicionarOuAtualizarFeriasDoForm() {
+            const feriasInicio = document.getElementById('ferias-inicio').value;
+            const feriasFim = document.getElementById('ferias-fim').value;
+            const itemId = document.getElementById('edit-item-id').value;
+
+            if ((feriasInicio && !feriasFim) || (!feriasInicio && feriasFim)) {
+                alert("⚠️ Preencha ambas as datas de início e fim para as férias, ou deixe ambas vazias.");
+                return;
+            }
+            if (feriasInicio && feriasFim) {
+                const dataInicioObj = parseDataUTC(feriasInicio);
+                const dataFimObj = parseDataUTC(feriasFim);
+                if (!dataInicioObj || !dataFimObj || dataFimObj < dataInicioObj) {
+                    alert("⚠️ Datas de férias inválidas ou data final anterior à inicial.");
+                    return;
+                }
+                exibirFeriasCadastradas(itemId, [{ inicio: feriasInicio, fim: feriasFim }]);
+                alert("💾 Período de férias definido no formulário. Lembre-se de salvar o item principal.");
+            } else {
+                exibirFeriasCadastradas(itemId, []);
+                alert("ℹ️ Campos de férias limpos. Salve o item para confirmar a remoção das férias.");
+            }
+        }
+
+        function getStatusProgramado(item, dataAlvoObj) {
+            if (!item || !dataAlvoObj) {
+                return { status: "⚠️ Erro Interno (Item ou Data)", tipo: 'erro', cssClass: 'erro' };
+            }
+            const dataAlvoStr = formatarDataParaChave(dataAlvoObj);
+
+            if (item.isVagaAberta) {
+                if (item.primeiraFolga && item.escala) {
+                    const dataPrimeiraFolgaVaga = parseDataUTC(item.primeiraFolga);
+                    if (dataPrimeiraFolgaVaga) {
+                        const cicloEscalaVaga = item.escala === '6x1' ? 7 : 6;
+                        const diferencaDiasBaseVaga = calcularDiferencaEmDias(dataPrimeiraFolgaVaga, dataAlvoObj);
+                        if (!isNaN(diferencaDiasBaseVaga) && (diferencaDiasBaseVaga % cicloEscalaVaga === 0)) {
+                            return { status: "⚠️ VAGA (Folga)", tipo: 'vaga-aberta-item', cssClass: 'vaga-aberta-item folga' };
+                        }
+                        return { status: "⚠️ VAGA (Trabalho)", tipo: 'vaga-aberta-item', cssClass: 'vaga-aberta-item trabalhando' };
+                    }
+                }
+                return { status: "⚠️ VAGA", tipo: 'vaga-aberta-item', cssClass: 'vaga-aberta-item' };
+            }
+
+            const override = diarioOverrides[dataAlvoStr]?.[item.id];
+            if (override) {
+                if (override === 'atestado') return { status: "🩺 Atestado", tipo: 'atestado', cssClass: 'atestado' };
+                if (override === 'falta') return { status: "❌ Falta", tipo: 'falta', cssClass: 'falta' };
+            }
+
+            const feriasValidas = (Array.isArray(item.feriasProgramadas) ? item.feriasProgramadas : []).filter(p => p && p.inicio && p.fim);
+            if (feriasValidas.length > 0) {
+                for (const periodo of feriasValidas) {
+                    const inicioFerias = parseDataUTC(periodo.inicio);
+                    const fimFerias = parseDataUTC(periodo.fim);
+                    if (inicioFerias && fimFerias && dataAlvoObj >= inicioFerias && dataAlvoObj <= fimFerias) {
+                        return { status: "🏖️ Férias", tipo: 'ferias', cssClass: 'ferias', periodoFerias: periodo };
+                    }
+                }
+            }
+
+            if (!item.primeiraFolga || !item.escala) return { status: "⚠️ Info Escala Incompleta", tipo: 'erro', cssClass: 'erro' };
+            const dataPrimeiraFolga = parseDataUTC(item.primeiraFolga);
+            if (!dataPrimeiraFolga) return { status: "⚠️ Data Folga Inválida", tipo: 'erro', cssClass: 'erro'};
+
+            const cicloEscala = item.escala === '6x1' ? 7 : 6;
+            const diferencaDiasBase = calcularDiferencaEmDias(dataPrimeiraFolga, dataAlvoObj);
+
+            if (isNaN(diferencaDiasBase)) {
+                 return { status: "⚠️ Erro Cálculo Escala", tipo: 'erro', cssClass: 'erro' };
+            }
+
+            const ehDiaDeFolgaPelaEscala = (diferencaDiasBase % cicloEscala === 0);
+
+            if (ehDiaDeFolgaPelaEscala) {
+                return { status: "😌 Folga", tipo: 'folga', cssClass: 'folga' };
+            } else {
+                return { status: "💪 Presente", tipo: 'trabalhando', cssClass: 'trabalhando' };
+            }
+        }
+
+        function getDescricoesAtivasParaData(item, dataAlvoObj, dataAtualStrParam) {
+            const descricoesAtivas = [];
+            if (!item || item.isVagaAberta || !Array.isArray(item.descricoesPersonalizadas) || item.descricoesPersonalizadas.length === 0) {
+                return descricoesAtivas;
+            }
+            if (!dataAlvoObj || !(dataAlvoObj instanceof Date) || isNaN(dataAlvoObj.getTime())) return descricoesAtivas;
+
+            const dataAlvoStr = formatarDataParaChave(dataAlvoObj);
+
+            item.descricoesPersonalizadas.forEach(desc => {
+                let ativa = false;
+                switch (desc.tipoAgendamento) {
+                    case 'semData':
+                        if (dataAlvoStr === dataAtualStrParam) ativa = true;
+                        break;
+                    case 'dataEspecifica':
+                        if (desc.dataEspecifica && dataAlvoStr === desc.dataEspecifica.trim()) ativa = true;
+                        break;
+                    case 'periodoDeterminado':
+                        if (desc.dataInicioPeriodo && desc.dataFimPeriodo) {
+                            const inicioP = parseDataUTC(desc.dataInicioPeriodo.trim());
+                            const fimP = parseDataUTC(desc.dataFimPeriodo.trim());
+                            if (inicioP && fimP && dataAlvoObj >= inicioP && dataAlvoObj <= fimP) ativa = true;
+                        }
+                        break;
+                    case 'recorrente':
+                        if (desc.dataInicioRecorrencia && desc.frequenciaRecorrencia) {
+                            const inicioR = parseDataUTC(desc.dataInicioRecorrencia.trim());
+                            if (inicioR && dataAlvoObj >= inicioR) {
+                                const diffDias = calcularDiferencaEmDias(inicioR, dataAlvoObj);
+                                if (diffDias >= 0) {
+                                    const ciclo = desc.frequenciaRecorrencia === "5x1" ? 6 : 7;
+                                    if (diffDias % ciclo === 0) ativa = true;
+                                }
+                            }
+                        }
+                        break;
+                }
+                if (ativa && desc.texto) descricoesAtivas.push(desc.texto);
+            });
+            return descricoesAtivas;
+        }
+
+        function getObservacoesProgramadasAtivas(item, dataAlvoObj, dataAtualStrParam) {
+            const observacoesAtivas = [];
+            if (!item || item.isVagaAberta || !Array.isArray(item.descricoesProgramadas) || item.descricoesProgramadas.length === 0) {
+                return observacoesAtivas;
+            }
+            if (!dataAlvoObj || !(dataAlvoObj instanceof Date) || isNaN(dataAlvoObj.getTime())) return observacoesAtivas;
+
+            const dataAlvoStr = formatarDataParaChave(dataAlvoObj);
+
+            item.descricoesProgramadas.forEach(obs => {
+                if (!obs.ativa || !obs.texto) return;
+                let ehParaExibirPelaData = false;
+                switch (obs.tipoAgendamento) {
+                    case 'semData':
+                        if (dataAlvoStr === dataAtualStrParam) ehParaExibirPelaData = true;
+                        break;
+                    case 'dataEspecifica':
+                        if (obs.dataEspecifica && dataAlvoStr === obs.dataEspecifica.trim()) ehParaExibirPelaData = true;
+                        break;
+                    case 'periodoDeterminado':
+                        if (obs.dataInicioPeriodo && obs.dataFimPeriodo) {
+                            const inicioP = parseDataUTC(obs.dataInicioPeriodo.trim());
+                            const fimP = parseDataUTC(obs.dataFimPeriodo.trim());
+                            if (inicioP && fimP && dataAlvoObj >= inicioP && dataAlvoObj <= fimP) ehParaExibirPelaData = true;
+                        }
+                        break;
+                    case 'recorrente':
+                         if (obs.dataInicioRecorrencia && obs.frequenciaRecorrencia) {
+                            const inicioR = parseDataUTC(obs.dataInicioRecorrencia.trim());
+                            if (inicioR && dataAlvoObj >= inicioR) {
+                                const diffDias = calcularDiferencaEmDias(inicioR, dataAlvoObj);
+                                if (diffDias >= 0) {
+                                    const ciclo = obs.frequenciaRecorrencia === "5x1" ? 6 : 7;
+                                    if (diffDias % ciclo === 0) ehParaExibirPelaData = true;
+                                }
+                            }
+                        }
+                        break;
+                }
+                if (ehParaExibirPelaData) {
+                    observacoesAtivas.push(obs.texto);
+                }
+            });
+            return observacoesAtivas;
+        }
+
+        function construirHtmlObservacoesProgramadas(itemId) {
+            const item = itensEscala.find(i => i.id === itemId);
+            if (!item || item.isVagaAberta) return '';
+
+            let html = `
+                <div class="observacoes-programadas-section" id="obs-prog-section-${itemId}">
+                    <h4>Observações Programadas</h4>
+                    <button type="button" class="secondary small" style="margin-bottom:10px;" onclick="abrirFormAdicionarObservacaoProgramada('${itemId}')">➕ Adicionar Nova Observação Programada</button>
+                    <div id="form-add-op-${itemId}" class="form-add-observacao-programada" style="display:none;">
+                        <input type="hidden" id="editing-op-id-${itemId}">
+                        <div class="form-group">
+                            <label for="op-texto-${itemId}">Texto da Observação:</label>
+                            <textarea id="op-texto-${itemId}" placeholder="Digite a observação programada"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display:inline-block; margin-right:10px;">
+                                <input type="checkbox" id="op-ativa-${itemId}" checked> Ativa
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="op-tipo-agendamento-${itemId}">Quando exibir?</label>
+                            <select id="op-tipo-agendamento-${itemId}" onchange="toggleCamposObservacaoProgramadaCondicionais('${itemId}')">
+                                <option value="semData">Somente Hoje (dia atual)</option>
+                                <option value="dataEspecifica">Em Data Específica</option>
+                                <option value="periodoDeterminado">Período Determinado (Início e Fim)</option>
+                                <option value="recorrente">Recorrente (Início e Ciclo)</option>
+                            </select>
+                        </div>
+                        <div id="op-campo-data-especifica-${itemId}" class="form-group campo-condicional-observacao-programada">
+                            <label for="op-data-especifica-${itemId}">Data Específica:</label>
+                            <input type="date" id="op-data-especifica-${itemId}">
+                        </div>
+                        <div id="op-campos-periodo-${itemId}" class="campo-condicional-observacao-programada">
+                            <div class="form-group">
+                                <label for="op-data-inicio-periodo-${itemId}">Data de Início do Período:</label>
+                                <input type="date" id="op-data-inicio-periodo-${itemId}">
+                            </div>
+                            <div class="form-group">
+                                <label for="op-data-fim-periodo-${itemId}">Data de Fim do Período:</label>
+                                <input type="date" id="op-data-fim-periodo-${itemId}">
+                            </div>
+                        </div>
+                        <div id="op-campos-recorrencia-${itemId}" class="campo-condicional-observacao-programada">
+                             <div class="form-group">
+                                <label for="op-data-inicio-recorrencia-${itemId}">Data de Início da Recorrência:</label>
+                                <input type="date" id="op-data-inicio-recorrencia-${itemId}">
+                            </div>
+                            <div class="form-group">
+                                <label for="op-frequencia-${itemId}">Ciclo de Repetição:</label>
+                                <select id="op-frequencia-${itemId}">
+                                    <option value="5x1">Ciclo: 1 dia SIM, 5 dias NÃO</option>
+                                    <option value="6x1">Ciclo: 1 dia SIM, 6 dias NÃO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-buttons-op">
+                            <button type="button" class="secondary small" onclick="fecharFormAdicionarObservacaoProgramada('${itemId}')">Cancelar</button>
+                            <button type="button" id="btn-salvar-op-${itemId}" class="success small" onclick="salvarObservacaoProgramada('${itemId}')">💾 Salvar Observação</button>
+                        </div>
+                    </div>
+                    <div class="lista-observacoes-programadas-salvas" id="lista-op-salvas-${itemId}">
+                        <ul></ul>
+                    </div>
+                </div>`;
+            return html;
+        }
+
+        function renderizarListaObservacoesProgramadas(itemId) {
+            const item = itensEscala.find(i => i.id === itemId);
+            if (!item) return;
+
+            const containerLista = document.getElementById(`lista-op-salvas-${itemId}`);
+            if (!containerLista) {
+                console.warn(`Container #lista-op-salvas-${itemId} não encontrado ao renderizar lista.`);
+                return;
+            }
+            let ul = containerLista.querySelector('ul');
+            if (!ul) {
+                ul = document.createElement('ul');
+                containerLista.appendChild(ul);
+            }
+            ul.innerHTML = '';
+
+            const observacoesProgArray = item.descricoesProgramadas || [];
+            if (observacoesProgArray.length > 0) {
+                observacoesProgArray.forEach(op => {
+                    let detalhesAgendamento = '';
+                    if (op.tipoAgendamento === 'dataEspecifica' && op.dataEspecifica) detalhesAgendamento = `Data: ${formatarDataParaExibicao(parseDataUTC(op.dataEspecifica))}`;
+                    else if (op.tipoAgendamento === 'periodoDeterminado' && op.dataInicioPeriodo && op.dataFimPeriodo) detalhesAgendamento = `Período: ${formatarDataParaExibicao(parseDataUTC(op.dataInicioPeriodo))} a ${formatarDataParaExibicao(parseDataUTC(op.dataFimPeriodo))}`;
+                    else if (op.tipoAgendamento === 'recorrente' && op.dataInicioRecorrencia && op.frequenciaRecorrencia) detalhesAgendamento = `Recorrente ${op.frequenciaRecorrencia}, início: ${formatarDataParaExibicao(parseDataUTC(op.dataInicioRecorrencia))}`;
+                    else if (op.tipoAgendamento === 'semData') detalhesAgendamento = `Somente Hoje`;
+
+                    const li = document.createElement('li');
+                    li.dataset.opId = op.id;
+                    li.innerHTML = `
+                        <div class="op-content">
+                            <span class="op-texto">${op.texto}</span>
+                            <span class="op-detalhes">(${detalhesAgendamento})</span>
+                            <span class="op-status">${op.ativa ? 'Status: Ativa' : 'Status: Inativa'}</span>
+                        </div>
+                        <div class="op-actions">
+                            <button class="warning small" onclick="editarObservacaoProgramada('${itemId}','${op.id}')">Editar</button>
+                            <button class="danger small" onclick="excluirObservacaoProgramada('${itemId}','${op.id}')">Excluir</button>
+                        </div>`;
+                    ul.appendChild(li);
+                });
+            } else {
+                ul.innerHTML = "<li>Nenhuma observação programada adicionada.</li>";
+            }
+        }
+
+        function abrirFormAdicionarObservacaoProgramada(itemId, opIdToEdit = null) {
+            const formDiv = document.getElementById(`form-add-op-${itemId}`);
+            const editingIdInput = document.getElementById(`editing-op-id-${itemId}`);
+            const btnSalvarOp = document.getElementById(`btn-salvar-op-${itemId}`);
+            const textoInput = document.getElementById(`op-texto-${itemId}`);
+            const ativaCheckbox = document.getElementById(`op-ativa-${itemId}`);
+            const tipoAgendamentoSelect = document.getElementById(`op-tipo-agendamento-${itemId}`);
+            const dataEspecificaInput = document.getElementById(`op-data-especifica-${itemId}`);
+            const dataInicioPeriodoInput = document.getElementById(`op-data-inicio-periodo-${itemId}`);
+            const dataFimPeriodoInput = document.getElementById(`op-data-fim-periodo-${itemId}`);
+            const dataInicioRecorrenciaInput = document.getElementById(`op-data-inicio-recorrencia-${itemId}`);
+            const frequenciaSelect = document.getElementById(`op-frequencia-${itemId}`);
+
+            if (!formDiv || !editingIdInput || !btnSalvarOp || !textoInput || !ativaCheckbox || !tipoAgendamentoSelect || !dataEspecificaInput || !dataInicioPeriodoInput || !dataFimPeriodoInput || !dataInicioRecorrenciaInput || !frequenciaSelect) {
+                console.error("Elementos do formulário de observação programada não encontrados para item " + itemId);
+                return;
+            }
+
+            editingIdInput.value = opIdToEdit || '';
+
+            if (opIdToEdit) {
+                const item = itensEscala.find(i => i.id === itemId);
+                const op = item ? item.descricoesProgramadas.find(d => d.id === opIdToEdit) : null;
+                if (op) {
+                    textoInput.value = op.texto;
+                    ativaCheckbox.checked = op.ativa;
+                    tipoAgendamentoSelect.value = op.tipoAgendamento;
+                    dataEspecificaInput.value = op.dataEspecifica || '';
+                    dataInicioPeriodoInput.value = op.dataInicioPeriodo || '';
+                    dataFimPeriodoInput.value = op.dataFimPeriodo || '';
+                    dataInicioRecorrenciaInput.value = op.dataInicioRecorrencia || '';
+                    frequenciaSelect.value = op.frequenciaRecorrencia || '5x1';
+                    btnSalvarOp.textContent = '💾 Atualizar Observação';
+                } else {
+                    editingIdInput.value = '';
+                    alert("Observação para edição não encontrada.");
+                }
+            } else {
+                textoInput.value = '';
+                ativaCheckbox.checked = true;
+                tipoAgendamentoSelect.value = 'semData';
+                dataEspecificaInput.value = '';
+                dataInicioPeriodoInput.value = '';
+                dataFimPeriodoInput.value = '';
+                dataInicioRecorrenciaInput.value = '';
+                frequenciaSelect.value = '5x1';
+                btnSalvarOp.textContent = '💾 Salvar Observação';
+            }
+            toggleCamposObservacaoProgramadaCondicionais(itemId);
+            formDiv.style.display = 'block';
+            textoInput.focus();
+        }
+
+        function fecharFormAdicionarObservacaoProgramada(itemId){
+            const formDiv = document.getElementById(`form-add-op-${itemId}`);
+            if (formDiv) formDiv.style.display = 'none';
+            document.getElementById(`editing-op-id-${itemId}`).value = '';
+        }
+
+        function toggleCamposObservacaoProgramadaCondicionais(itemIdSuffix) {
+            const tipoEl = document.getElementById(`op-tipo-agendamento-${itemIdSuffix}`);
+            if (!tipoEl) return;
+            const tipo = tipoEl.value;
+            const campoDataEsp = document.getElementById(`op-campo-data-especifica-${itemIdSuffix}`);
+            const camposPeriodo = document.getElementById(`op-campos-periodo-${itemIdSuffix}`);
+            const camposRec = document.getElementById(`op-campos-recorrencia-${itemIdSuffix}`);
+
+            if(campoDataEsp) campoDataEsp.style.display = (tipo === 'dataEspecifica') ? 'block' : 'none';
+            if(camposPeriodo) camposPeriodo.style.display = (tipo === 'periodoDeterminado') ? 'block' : 'none';
+            if(camposRec) camposRec.style.display = (tipo === 'recorrente') ? 'block' : 'none';
+        }
+
+        function salvarObservacaoProgramada(itemId) {
+            const item = itensEscala.find(i => i.id === itemId);
+            if (!item) { alert("Erro: Funcionário não encontrado."); return; }
+            if (!item.descricoesProgramadas) item.descricoesProgramadas = [];
+
+            const editingOpId = document.getElementById(`editing-op-id-${itemId}`).value;
+            const opData = {
+                id: editingOpId || gerarIdUnico(),
+                texto: document.getElementById(`op-texto-${itemId}`).value.trim(),
+                ativa: document.getElementById(`op-ativa-${itemId}`).checked,
+                tipoAgendamento: document.getElementById(`op-tipo-agendamento-${itemId}`).value,
+                dataEspecifica: document.getElementById(`op-data-especifica-${itemId}`).value.trim(),
+                dataInicioPeriodo: document.getElementById(`op-data-inicio-periodo-${itemId}`).value.trim(),
+                dataFimPeriodo: document.getElementById(`op-data-fim-periodo-${itemId}`).value.trim(),
+                dataInicioRecorrencia: document.getElementById(`op-data-inicio-recorrencia-${itemId}`).value.trim(),
+                frequenciaRecorrencia: document.getElementById(`op-frequencia-${itemId}`).value
+            };
+
+            if (!opData.texto) { alert("⚠️ Texto da observação programada é obrigatório."); return; }
+
+            if (editingOpId) {
+                const index = item.descricoesProgramadas.findIndex(op => op.id === editingOpId);
+                if (index > -1) item.descricoesProgramadas[index] = opData;
+                else {
+                    opData.id = gerarIdUnico();
+                    item.descricoesProgramadas.push(opData);
+                }
+                alert("Observação programada atualizada!");
+            } else {
+                item.descricoesProgramadas.push(opData);
+                alert("Observação programada adicionada!");
+            }
+            salvarItensEscalaNoStorage();
+            fecharFormAdicionarObservacaoProgramada(itemId);
+            renderizarListaObservacoesProgramadas(itemId);
+            atualizarExibicaoProgramacao();
+        }
+
+        function editarObservacaoProgramada(itemId, opId) {
+            abrirFormAdicionarObservacaoProgramada(itemId, opId);
+        }
+
+        function excluirObservacaoProgramada(itemId, opId) {
+            if (!confirm("Tem certeza que deseja excluir esta observação programada?")) return;
+            const item = itensEscala.find(i => i.id === itemId);
+            if (item && item.descricoesProgramadas) {
+                const lenAntes = item.descricoesProgramadas.length;
+                item.descricoesProgramadas = item.descricoesProgramadas.filter(op => op.id !== opId);
+                if (item.descricoesProgramadas.length < lenAntes) {
+                    salvarItensEscalaNoStorage();
+                    renderizarListaObservacoesProgramadas(itemId);
+                    atualizarExibicaoProgramacao();
+                    alert("Observação programada excluída!");
+                }
+            }
+        }
+
+        function carregarItensEscala() {
+            const dadosCrus = localStorage.getItem(STORAGE_KEY_ITENS_ESCALA);
+            let dados = [];
+            if (dadosCrus) {
+                try {
+                    dados = JSON.parse(dadosCrus);
+                } catch (e) {
+                    console.error("Erro ao parsear itensEscala:", e);
+                    dados = [];
+                }
+            }
+            if (!Array.isArray(dados)) { dados = []; }
+
+            dados.forEach(item => {
+                if(item.turno) turnosAtivos.add(item.turno); else turnosAtivos.add('outros');
+                if (item.descricoesPersonalizadas === undefined) item.descricoesPersonalizadas = [];
+                if (item.feriasProgramadas === undefined) item.feriasProgramadas = [];
+
+                if (item.notaOcultaProgramada && typeof item.notaOcultaProgramada === 'object') {
+                    if (!Array.isArray(item.descricoesProgramadas)) item.descricoesProgramadas = [];
+                    if (item.notaOcultaProgramada.texto && item.descricoesProgramadas.length === 0) {
+                        item.descricoesProgramadas.push({
+                            id: gerarIdUnico(),
+                            texto: item.notaOcultaProgramada.texto,
+                            ativa: item.notaOcultaProgramada.ativa !== undefined ? item.notaOcultaProgramada.ativa : !!item.notaOcultaProgramada.texto,
+                            tipoAgendamento: item.notaOcultaProgramada.tipoAgendamento || 'semData',
+                            dataEspecifica: item.notaOcultaProgramada.dataEspecifica || '',
+                            dataInicioPeriodo: item.notaOcultaProgramada.dataInicioPeriodo || '',
+                            dataFimPeriodo: item.notaOcultaProgramada.dataFimPeriodo || '',
+                            dataInicioRecorrencia: item.notaOcultaProgramada.dataInicioRecorrencia || '',
+                            frequenciaRecorrencia: item.notaOcultaProgramada.frequenciaRecorrencia || '5x1'
+                        });
+                        console.log(`Item ${item.id} migrado de notaOculta para descricoesProgramadas.`);
+                    }
+                } else if (item.descricoesProgramadas === undefined) {
+                    item.descricoesProgramadas = [];
+                }
+                delete item.notaOcultaProgramada;
+                delete item.descricao; delete item.plantaoFolga; delete item.dataInicioPlantaoFolga; delete item.obsPlantaoFolga;
+                delete item.plantaoOutroTurno; delete item.dataInicioPlantaoOutroTurno; delete item.obsPlantaoOutroTurno;
+            });
+            return dados;
+        }
+
+        function exibirProgramacaoDiaria(dataObj) {
+            const listaProgramacaoDiv = document.getElementById('lista-programacao');
+            if (!listaProgramacaoDiv) { console.error("Elemento #lista-programacao não encontrado."); return; }
+            listaProgramacaoDiv.innerHTML = '';
+
+            if (!dataObj || !(dataObj instanceof Date) || isNaN(dataObj.getTime())) {
+                listaProgramacaoDiv.innerHTML = '<p class="empty-state">Data de visualização inválida.</p>';
+                return;
+            }
+
+            const dataAlvoStrParaAcoes = formatarDataParaChave(dataObj);
+            const turnosDisplay = {};
+            const todosOsTurnosPossiveis = ['manha', 'intermediario', 'tarde', 'noite', 'outros'];
+            todosOsTurnosPossiveis.forEach(turno => { turnosDisplay[turno] = []; });
+            turnosAtivos.forEach(turno => { if (!turnosDisplay[turno]) turnosDisplay[turno] = []; });
+
+            itensEscala.forEach(item => {
+                const statusInfo = getStatusProgramado(item, dataObj);
+                const descricoesVisiveisTextos = getDescricoesAtivasParaData(item, dataObj, dataAtualGlobal);
+                const observacoesProgAtivasTextos = getObservacoesProgramadasAtivas(item, dataObj, dataAtualGlobal);
+                const turnoDoItem = item.turno && todosOsTurnosPossiveis.includes(item.turno) ? item.turno : 'outros';
+                turnosDisplay[turnoDoItem].push({ ...item, statusInfo, descricoesVisiveisTextos, observacoesProgAtivasTextos });
+            });
+
+            if (itensEscala.length === 0) {
+                listaProgramacaoDiv.innerHTML = `<div class="empty-state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg><p>Nenhum funcionário ou vaga cadastrada na escala. Clique em "Adicionar Funcionário à Escala" para começar.</p></div>`;
+                return;
+            }
+
+            let algumItemRenderizadoGlobalmente = false;
+            const ordemTurnos = ['manha', 'intermediario', 'tarde', 'noite', 'outros'];
+
+            ordemTurnos.forEach(turnoKey => {
+                if (!turnosDisplay[turnoKey] || turnosDisplay[turnoKey].length === 0) return;
+
+                const divTurnoContainer = document.createElement('div');
+                divTurnoContainer.classList.add('turno-group', `turno-caixa-${turnoKey}`);
+
+                let iconeTurno = '';
+                let nomeTurnoCapitalizado = turnoKey.charAt(0).toUpperCase() + turnoKey.slice(1);
+                if (turnoKey === 'manha') iconeTurno = '☀️ ';
+                else if (turnoKey === 'intermediario') iconeTurno = '⚙️ ';
+                else if (turnoKey === 'tarde') iconeTurno = '🌇 ';
+                else if (turnoKey === 'noite') iconeTurno = '🌙 ';
+                else if (turnoKey === 'outros') nomeTurnoCapitalizado = 'Outros/Não especificado';
+
+                const h3Turno = document.createElement('h3');
+                h3Turno.innerHTML = `${iconeTurno}${nomeTurnoCapitalizado}`;
+                divTurnoContainer.appendChild(h3Turno);
+
+                const turnoContentDiv = document.createElement('div');
+                turnoContentDiv.classList.add('turno-content');
+
+                turnosDisplay[turnoKey].sort((a,b) => (a.nome||'').localeCompare(b.nome||'')).forEach(itemComDados => {
+                    const item = itemComDados;
+                    const statusInfo = item.statusInfo;
+                    const descVisiveis = item.descricoesVisiveisTextos || [];
+                    const obsProg = item.observacoesProgAtivasTextos || [];
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('funcionario-item');
+                    if (statusInfo.cssClass) statusInfo.cssClass.split(' ').forEach(cls => itemDiv.classList.add(cls.trim()));
+                    else if (statusInfo.tipo) itemDiv.classList.add(statusInfo.tipo);
+                    itemDiv.dataset.itemId = item.id;
+
+                    let todasDescricoesHtml = '';
+                    if (descVisiveis.length > 0) {
+                        todasDescricoesHtml += descVisiveis.map(d => `<span class="descricao-personalizada-inline">Visível: ${d}</span>`).join('');
+                    }
+                    if (obsProg.length > 0) {
+                        todasDescricoesHtml += obsProg.map(d => `<span class="observacao-programada-inline">Prog: ${d}</span>`).join('');
+                    }
+
+                    let botoesAcaoHtml = '';
+                    let observacoesProgramadasHtmlParaExpandido = '';
+
+                    if (item.isVagaAberta) {
+                         botoesAcaoHtml = `
+                            <button title="Editar Vaga" onclick="event.stopPropagation(); abrirModalEdicaoItem('${item.id}')">👤 Editar</button>
+                            <button title="Excluir Vaga" onclick="event.stopPropagation(); excluirItemEscala('${item.id}')">🗑️ Excluir</button>
+                        `;
+                    } else {
+                        botoesAcaoHtml = `
+                            <button title="Editar Cadastro" onclick="event.stopPropagation(); abrirModalEdicaoItem('${item.id}')">👤 Editar Perfil</button>
+                            <button title="Marcar Atestado" onclick="event.stopPropagation(); definirStatusDia('${item.id}', '${dataAlvoStrParaAcoes}', 'atestado')">🩺 Atestado</button>
+                            <button title="Marcar Falta" onclick="event.stopPropagation(); definirStatusDia('${item.id}', '${dataAlvoStrParaAcoes}', 'falta')">❌ Falta</button>
+                            <button title="Compartilhar Status" onclick="event.stopPropagation(); compartilharStatus('${item.id}', '${dataAlvoStrParaAcoes}')">🔗 Compartilhar</button>
+                            <button title="Definir como Programado" onclick="event.stopPropagation(); definirStatusDia('${item.id}', '${dataAlvoStrParaAcoes}', 'programado')">🗓️ Programado</button>
+                            <button title="Excluir Cadastro" onclick="event.stopPropagation(); excluirItemEscala('${item.id}')">🗑️ Excluir</button>
+                        `;
+                        observacoesProgramadasHtmlParaExpandido = construirHtmlObservacoesProgramadas(item.id);
+                    }
+
+                    itemDiv.innerHTML = `
+                        <div class="main-info-compacto">
+                            <div class="nome-compacto">
+                                <span class="nome-compacto-text">${item.nome || "Nome não definido"}</span>
+                                ${todasDescricoesHtml}
+                            </div>
+                            ${gerarIndicadorCompactoHTML(statusInfo, item, dataObj)}
+                        </div>
+                        <div class="item-actions">
+                            <div class="item-actions-buttons">${botoesAcaoHtml}</div>
+                            ${observacoesProgramadasHtmlParaExpandido}
+                        </div>
+                    `;
+                    turnoContentDiv.appendChild(itemDiv);
+                    algumItemRenderizadoGlobalmente = true;
+
+                    itemDiv.addEventListener('click', function(e) {
+                        if (e.target.closest('.observacoes-programadas-section') || e.target.closest('.item-actions-buttons button')) {
+                            return;
+                        }
+                        const estavaAberto = this.classList.contains('actions-expanded');
+                        document.querySelectorAll('.funcionario-item.actions-expanded').forEach(openItem => {
+                            if (openItem !== this) {
+                                openItem.classList.remove('actions-expanded');
+                                const formObs = openItem.querySelector('.form-add-observacao-programada');
+                                if(formObs) formObs.style.display = 'none';
+                            }
+                        });
+                        if (!estavaAberto) {
+                            this.classList.add('actions-expanded');
+                            if (!item.isVagaAberta) {
+                                renderizarListaObservacoesProgramadas(item.id);
+                                fecharFormAdicionarObservacaoProgramada(item.id);
+                                toggleCamposObservacaoProgramadaCondicionais(item.id);
+                            }
+                        } else {
+                            this.classList.remove('actions-expanded');
+                            if (!item.isVagaAberta) fecharFormAdicionarObservacaoProgramada(item.id);
+                        }
+                    });
+                });
+                divTurnoContainer.appendChild(turnoContentDiv);
+                listaProgramacaoDiv.appendChild(divTurnoContainer);
+            });
+
+            if (!algumItemRenderizadoGlobalmente && itensEscala.length > 0) {
+                 listaProgramacaoDiv.innerHTML = '<p class="empty-state">Nenhum item programado para os turnos nesta data.</p>';
+            }
+        }
+
+        function toggleCamposDescricaoCondicionais() {
+            const tipoAgendamentoEl = document.getElementById('nova-descricao-tipo-agendamento');
+            const campoDataEspecificaEl = document.getElementById('campo-data-especifica-descricao');
+            const camposPeriodoDeterminadoEl = document.getElementById('campos-periodo-determinado-descricao');
+            const camposRecorrenciaEl = document.getElementById('campos-recorrencia-descricao');
+
+            if(!tipoAgendamentoEl || !campoDataEspecificaEl || !camposPeriodoDeterminadoEl || !camposRecorrenciaEl) return;
+
+            const tipo = tipoAgendamentoEl.value;
+            campoDataEspecificaEl.style.display = (tipo === 'dataEspecifica') ? 'block' : 'none';
+            camposPeriodoDeterminadoEl.style.display = (tipo === 'periodoDeterminado') ? 'block' : 'none';
+            camposRecorrenciaEl.style.display = (tipo === 'recorrente') ? 'block' : 'none';
+
+            const editingDescId = document.getElementById('editing-desc-id').value;
+            if (!editingDescId) {
+                if (tipo !== 'dataEspecifica') document.getElementById('nova-descricao-data-especifica').value = '';
+                if (tipo !== 'periodoDeterminado') {
+                    document.getElementById('nova-descricao-data-inicio-periodo').value = '';
+                    document.getElementById('nova-descricao-data-fim-periodo').value = '';
+                }
+                if (tipo !== 'recorrente') {
+                    document.getElementById('nova-descricao-data-inicio-recorrencia').value = '';
+                    document.getElementById('nova-descricao-frequencia').value = '5x1';
+                }
+            }
+        }
+
+        function gerarIndicadorCompactoHTML(statusInfo, item, dataObj) {
+            const textoDoStatus = (statusInfo && typeof statusInfo.status === 'string') ? statusInfo.status : "Erro";
+            return `<span class="status-indicador-compacto">${textoDoStatus}</span>`;
+        }
+
+        function salvarOverridesNoStorage() {
+            localStorage.setItem(STORAGE_KEY_OVERRIDES, JSON.stringify(diarioOverrides));
+        }
+
+        function carregarOverrides() {
+            const d = localStorage.getItem(STORAGE_KEY_OVERRIDES);
+            return d ? JSON.parse(d) : {};
+        }
+
+        function carregarDados() {
+            itensEscala = carregarItensEscala();
+            diarioOverrides = carregarOverrides();
+        }
+
+        function _gerarDadosBackupString() {
+            if (itensEscala.length === 0 && Object.keys(diarioOverrides).length === 0) {
+                return null;
+            }
+            const dadosCompletos = {
+                itensEscala: itensEscala,
+                overrides: diarioOverrides,
+                versaoApp: "Alfa_v2_4_file_share",
+                dataBackup: new Date().toISOString()
+            };
+            return JSON.stringify(dadosCompletos, null, 2);
+        }
+
+        function mostrarBackupParaCopiaManual() {
+            const dadosString = _gerarDadosBackupString();
+            if (!dadosString) {
+                alert("ℹ️ Não há dados para copiar.");
+                return;
+            }
+
+            const textarea = document.getElementById('backup-data-textarea');
+            const container = document.getElementById('copia-manual-backup-container');
+
+            if (textarea && container) {
+                textarea.value = dadosString;
+                container.style.display = 'block';
+                textarea.focus(); 
+                textarea.select(); 
+                
+                alert("Os dados do backup estão prontos para cópia na área abaixo.\n\nSiga as instruções exibidas para salvar o arquivo manualmente.\n\nDepois de copiar o texto, você pode fechá-lo e colar em um editor para salvar como .json.");
+                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                console.error("Erro: Elementos para cópia manual não encontrados.");
+                prompt("Não foi possível exibir a área de cópia. Copie os dados do backup manualmente daqui (Ctrl+C):", dadosString);
+            }
+        }
+
+        async function enviarBackupParaWhatsApp() {
+            const dadosString = _gerarDadosBackupString();
+            if (!dadosString) {
+                alert("ℹ️ Não há dados para enviar.");
+                return;
+            }
+
+            const dataAtual = new Date();
+            const dia = String(dataAtual.getDate()).padStart(2, '0');
+            const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
+            const ano = dataAtual.getFullYear();
+            const nomeArquivo = `backup_escala_${dia}-${mes}-${ano}.json`;
+
+            const file = new File([dadosString], nomeArquivo, { type: 'application/json' });
+
+            if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: `Backup Escala ${dia}-${mes}-${ano}`,
+                        text: `Arquivo de backup da escala gerado em ${dia}/${mes}/${ano}.`
+                    });
+                } catch (error) {
+                    console.error('Erro ao compartilhar:', error);
+                    if (error.name !== 'AbortError') { 
+                        alert(`❌ Erro ao tentar compartilhar o arquivo diretamente: ${error.message}\n\nComo alternativa, tentaremos o download do arquivo "${nomeArquivo}" para envio manual.\n\nSe o download não iniciar, por favor, utilize a opção "Copiar Dados de Backup (Manual)" e siga as instruções.`);
+                        forcarDownloadBackup(dadosString, nomeArquivo);
+                    }
+                }
+            } else {
+                alert('⚠️ O compartilhamento direto de arquivos não é suportado por este navegador/dispositivo ou está bloqueado.\n\nTentaremos o download do arquivo de backup ("' + nomeArquivo + '") para que você possa enviá-lo manualmente.\n\nSe o download não iniciar, por favor, utilize a opção "Copiar Dados de Backup (Manual)" e siga as instruções.');
+                forcarDownloadBackup(dadosString, nomeArquivo);
+            }
+        }
+
+        function forcarDownloadBackup(dadosString, nomeArquivo) {
+            try { 
+                const blob = new Blob([dadosString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = nomeArquivo;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (e) {
+                console.error("Falha ao tentar forcarDownloadBackup:", e);
+                alert("❌ Falha na tentativa de download automático.\n\nIsso pode ser uma restrição do aplicativo que você está usando para rodar esta página.\n\nPor favor, utilize a opção 'Copiar Dados de Backup (Manual)'.");
+            }
+        }
+
+
+        function processarArquivoRestauracaoCompleta(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+
+            if (arquivo.type !== "application/json") {
+                alert('⚠️ Tipo de arquivo inválido. Por favor, selecione um arquivo .json de backup.');
+                event.target.value = null;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dadosRestaurados = JSON.parse(e.target.result);
+                    if (dadosRestaurados && dadosRestaurados.itensEscala && dadosRestaurados.overrides) {
+                        if (confirm("‼️ ATENÇÃO: Restaurar este backup substituirá TODOS os dados atuais. Deseja continuar?")) {
+
+                            let tempItensEscala = Array.isArray(dadosRestaurados.itensEscala) ? dadosRestaurados.itensEscala : [];
+                            tempItensEscala.forEach(item => {
+                                if (item.descricoesPersonalizadas === undefined) item.descricoesPersonalizadas = [];
+                                if (item.feriasProgramadas === undefined) item.feriasProgramadas = [];
+
+                                if (item.notaOcultaProgramada && typeof item.notaOcultaProgramada === 'object') {
+                                    if (!Array.isArray(item.descricoesProgramadas)) item.descricoesProgramadas = [];
+                                    if (item.notaOcultaProgramada.texto && item.descricoesProgramadas.length === 0) {
+                                        item.descricoesProgramadas.push({
+                                            id: gerarIdUnico(),
+                                            texto: item.notaOcultaProgramada.texto,
+                                            ativa: item.notaOcultaProgramada.ativa !== undefined ? item.notaOcultaProgramada.ativa : !!item.notaOcultaProgramada.texto,
+                                            tipoAgendamento: item.notaOcultaProgramada.tipoAgendamento || 'semData',
+                                            dataEspecifica: item.notaOcultaProgramada.dataEspecifica || '',
+                                            dataInicioPeriodo: item.notaOcultaProgramada.dataInicioPeriodo || '',
+                                            dataFimPeriodo: item.notaOcultaProgramada.dataFimPeriodo || '',
+                                            dataInicioRecorrencia: item.notaOcultaProgramada.dataInicioRecorrencia || '',
+                                            frequenciaRecorrencia: item.notaOcultaProgramada.frequenciaRecorrencia || '5x1'
+                                        });
+                                    }
+                                } else if (item.descricoesProgramadas === undefined) {
+                                    item.descricoesProgramadas = [];
+                                }
+                                delete item.notaOcultaProgramada;
+                                delete item.descricao; delete item.plantaoFolga; delete item.dataInicioPlantaoFolga; delete item.obsPlantaoFolga;
+                                delete item.plantaoOutroTurno; delete item.dataInicioPlantaoOutroTurno; delete item.obsPlantaoOutroTurno;
+                            });
+
+                            itensEscala = tempItensEscala;
+                            diarioOverrides = dadosRestaurados.overrides;
+                            turnosAtivos = new Set();
+                            itensEscala.forEach(item => {
+                                if(item.turno) turnosAtivos.add(item.turno); else turnosAtivos.add('outros');
+                            });
+
+                            salvarItensEscalaNoStorage();
+                            salvarOverridesNoStorage();
+                            atualizarExibicaoProgramacao();
+                            alert('📥 Dados completos restaurados com sucesso!');
+                        }
+                    } else {
+                        alert('⚠️ Arquivo de backup inválido. Não contém as estruturas esperadas.');
+                    }
+                } catch (error) {
+                    console.error("Erro ao processar restauração:", error);
+                    alert('❌ Erro ao ler o arquivo de backup. Verifique o console para detalhes.');
+                } finally {
+                    event.target.value = null;
+                }
+            };
+            reader.readAsText(arquivo);
+        }
+
+        function compartilharStatus(itemId, dataAlvoStr) {
+            const item = itensEscala.find(i => i.id === itemId);
+            const dataObj = parseDataUTC(dataAlvoStr);
+            if (!item || !dataObj) {
+                alert("Erro ao obter dados para compartilhamento.");
+                return;
+            }
+
+            const nomeFuncionario = item.nome;
+            const dataFormatada = formatarDataParaExibicao(dataObj);
+            const statusInfo = getStatusProgramado(item, dataObj);
+            const turno = item.turno ? (item.turno.charAt(0).toUpperCase() + item.turno.slice(1)) : "N/A";
+
+            let mensagem = `*Escala* 🗓️\nFuncionário: ${nomeFuncionario}\nData: ${dataFormatada}\nTurno: ${turno}\nStatus: ${statusInfo.status}`;
+
+            const descricoesVisiveis = getDescricoesAtivasParaData(item, dataObj, dataAtualGlobal);
+            if(descricoesVisiveis.length > 0){
+                mensagem += `\nObs. Visíveis: ${descricoesVisiveis.join(', ')}`;
+            }
+
+            const observacoesProgAtivas = getObservacoesProgramadasAtivas(item, dataObj, dataAtualGlobal);
+            if(observacoesProgAtivas.length > 0){
+                 mensagem += `\nObs. Programadas: ${observacoesProgAtivas.join(', ')}`;
+            }
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank');
+        }
+
+        function definirStatusDia(itemId, dataStr, novoStatus) {
+            if (!diarioOverrides[dataStr]) diarioOverrides[dataStr] = {};
+
+            if (novoStatus === 'programado') {
+                delete diarioOverrides[dataStr][itemId];
+                if (Object.keys(diarioOverrides[dataStr]).length === 0) delete diarioOverrides[dataStr];
+            } else {
+                diarioOverrides[dataStr][itemId] = novoStatus;
+            }
+            salvarOverridesNoStorage();
+            atualizarExibicaoProgramacao();
+        }
+
+        function excluirItemEscala(itemId) {
+            if (confirm("Tem certeza que deseja excluir este item da escala?")) {
+                itensEscala = itensEscala.filter(item => item.id !== itemId);
+                salvarItensEscalaNoStorage();
+                atualizarExibicaoProgramacao();
+                alert("Item excluído com sucesso!");
+            }
+        }
+
+        function abrirModalEdicaoItem(itemId) {
+            const itemParaEditar = itensEscala.find(item => item.id === itemId);
+            if (itemParaEditar) toggleCadastroForm(true, itemParaEditar);
+            else alert("Erro: Item não encontrado para edição.");
+        }
+
+        function atualizarExibicaoProgramacao() {
+            let dataVisualizacaoInputEl = document.getElementById('data-visualizacao');
+            let dataObj = parseDataUTC(dataVisualizacaoInputEl.value);
+
+            if (!dataObj) { 
+                dataObj = parseDataUTC(dataAtualGlobal);
+                if(dataObj && dataVisualizacaoInputEl) dataVisualizacaoInputEl.value = dataAtualGlobal; 
+            }
+
+            if(dataObj) {
+                document.getElementById('data-display').textContent = formatarDataParaExibicao(dataObj);
+                atualizarTituloComMesAno(dataObj); 
+            } else { 
+                document.getElementById('data-display').textContent = "Data Inválida";
+                atualizarTituloComMesAno(new Date()); 
+            }
+
+            exibirProgramacaoDiaria(dataObj);
+        }
+
+        function salvarItensEscalaNoStorage() {
+            localStorage.setItem(STORAGE_KEY_ITENS_ESCALA, JSON.stringify(itensEscala));
+            turnosAtivos = new Set();
+            itensEscala.forEach(item => {
+                if(item.turno) turnosAtivos.add(item.turno); else turnosAtivos.add('outros');
+            });
+        }
+
+        /*
+        Possíveis Melhorias Futuras (sugestões do usuário):
+        - Sincronização em nuvem
+        - Relatórios e estatísticas
+        - Compartilhamento de escalas entre usuários (além do backup individual)
+        - Notificações
+        */
+    </script>
+</body>
+</html>
